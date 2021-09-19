@@ -94,58 +94,58 @@ main(int argc, char *argv[])
 #include "user/user.h"
 
 void redirect(int k, int *p) {
-  close(k);
-  dup(p[k]);
-  close(p[0]);
-  close(p[1]);
+	close(k);
+	dup(p[k]);
+	close(p[0]);
+	close(p[1]);
 }
 
 //从左边pipe读，过滤，再写入右边pipe
 void sieve(int p) {
-  int n;
-  while (read(0, &n, sizeof(int))) {
-    if (n % p != 0) {
-      write(1, &n, sizeof(int));
-    }
-  }
+	int n;
+	while (read(0, &n, sizeof(int))) {
+		if (n % p != 0) {
+			write(1, &n, sizeof(int));
+		}
+	}
 }
 
 //左边管道读取的第一个数是本轮的筛（素数）
 //子进程用得到的筛prime处理本轮的筛选
 //父进程开启下一轮筛选
 void sink() {
-  int p[2];
-  int prime;
-  if (read(0, &prime, sizeof(int))) {
-    printf("prime %d\n", prime);
-    pipe(p);
-    if (fork()) {
-      redirect(0, p);
-      sink();
-    }
-    else {
-      redirect(1, p);
-      sieve(prime);
-    }
-  }
+	int p[2];
+	int prime;
+	if (read(0, &prime, sizeof(int))) {
+		printf("prime %d\n", prime);
+		pipe(p);
+		if (fork()) {
+			redirect(0, p);
+			sink();
+		}
+		else {
+			redirect(1, p);
+			sieve(prime);
+		}
+	}
 }
 
 int
-main(int argc, char *argv[]){
+main(int argc, char *argv[]) {
 	int p[2];
 	pipe(p);
-	if (fork()>0) {
-    	redirect(0, p);
-    	sink();
-  	}
+	if (fork() > 0) {
+		redirect(0, p);
+		sink();
+	}
 	else { //读入2-35
-    	redirect(1, p);
-		  for (int i = 2; i < 36; i++) {
-    	write(1, &i, sizeof(int));
-     }
-  }
+		redirect(1, p);
+		for (int i = 2; i < 36; i++) {
+			write(1, &i, sizeof(int));
+		}
+	}
 
-  exit(0);
+	exit(0);
 }
 ```
 
@@ -161,62 +161,62 @@ main(int argc, char *argv[]){
 #include "kernel/fs.h"
 
 void
-find(char *path,char *filename)
+find(char *path, char *filename)
 {
 	char buf[512];
 	char *p;
 	int fd;
 	struct dirent de;
-  struct stat st;
+	struct stat st;
 
-	if((fd = open(path, 0)) < 0){
-    	fprintf(2, "find: cannot open %s\n", path);
-    	return;
-  	}
+	if ((fd = open(path, 0)) < 0) {
+		fprintf(2, "find: cannot open %s\n", path);
+		return;
+	}
 	//fstat:get file info
-  if(fstat(fd, &st) < 0){
-    	fprintf(2, "find: cannot stat %s\n", path);
-    	close(fd);
-    	return;
-  	}
+	if (fstat(fd, &st) < 0) {
+		fprintf(2, "find: cannot stat %s\n", path);
+		close(fd);
+		return;
+	}
 
-	switch(st.type){
-	//if file
+	switch (st.type) {
+		//if file
 	case T_FILE:
 		//find the file name
-		for(p=path+strlen(path); p >= path && *p != '/'; p--)
-    		;
-  		p++;
-		if(strcmp(p,filename)==0)
-			printf("%s\n",path);
-		  break;
+		for (p = path + strlen(path); p >= path && *p != '/'; p--)
+			;
+		p++;
+		if (strcmp(p, filename) == 0)
+			printf("%s\n", path);
+		break;
 
-	//if dir
+		//if dir
 	case T_DIR:
 		//printf("dir: %s\n",path);
-		if(strlen(path) + 1 + DIRSIZ + 1 > sizeof buf){
-     		printf("find: path too long\n");
-        break;
-    	}
+		if (strlen(path) + 1 + DIRSIZ + 1 > sizeof buf) {
+			printf("find: path too long\n");
+			break;
+		}
 		strcpy(buf, path);
 
-   	p = buf+strlen(buf);
-    *p++ = '/';
-		while(read(fd, &de, sizeof(de)) == sizeof(de)){
-			if(de.inum == 0)
-        		continue;
-      memmove(p, de.name, DIRSIZ);
-      p[DIRSIZ] = 0;
+		p = buf + strlen(buf);
+		*p++ = '/';
+		while (read(fd, &de, sizeof(de)) == sizeof(de)) {
+			if (de.inum == 0)
+				continue;
+			memmove(p, de.name, DIRSIZ);
+			p[DIRSIZ] = 0;
 
 			//don't enter dir "." and ".."
-      if(strcmp(p,".")==0||strcmp(p,"..")==0)
-          continue;
+			if (strcmp(p, ".") == 0 || strcmp(p, "..") == 0)
+				continue;
 
-			if(stat(buf, &st) < 0){
-        	printf("find: cannot stat %s\n", buf);
-        		continue;
-      		}
-			find(buf,filename);
+			if (stat(buf, &st) < 0) {
+				printf("find: cannot stat %s\n", buf);
+				continue;
+			}
+			find(buf, filename);
 		}//while
 		break;
 	}//switch
@@ -228,11 +228,11 @@ find(char *path,char *filename)
 int
 main(int argc, char *argv[])
 {
-	if(argc!=3){
-		fprintf(2,"Usage:find dir file...\n");
+	if (argc != 3) {
+		fprintf(2, "Usage:find dir file...\n");
 	}
 
-	find(argv[1],argv[2]);
+	find(argv[1], argv[2]);
 
 	exit(0);
 }
