@@ -254,7 +254,6 @@ main(int argc, char *argv[])
 int read_argument(int argc,char (*new_argv)[N])
 {
 	char *p=new_argv[argc];
-	//read eof can cause failuse???!!!
 	while(read(0,p,sizeof(char))>0){
 
 		if(*p=='\n'){
@@ -288,7 +287,7 @@ main(int argc, char *argv[])
 	}
 	int cmd_num;
 	while((cmd_num=read_argument(num,new_argv))>0){
-
+    //另做一个char**以满足exec的参数需要
 		char *new_argv2[MAXARG];
 		for(int i=0;i<cmd_num;i++){
 			new_argv2[i]=new_argv[i];
