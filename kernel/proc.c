@@ -176,9 +176,22 @@ proc_kpagetable(void)
   if(kpagetable == 0)
     return 0;
   //just copy kernel_pagetable
-  for(int i=0;i<512;i++){
+  for(int i=1;i<512;i++){
     kpagetable[i]=kernel_pagetable[i];
   }
+
+  // uart registers
+  ukvmmap(kpagetable, UART0, UART0, PGSIZE, PTE_R | PTE_W);
+
+  // virtio mmio disk interface
+  ukvmmap(kpagetable, VIRTIO0, VIRTIO0, PGSIZE, PTE_R | PTE_W);
+
+  // CLINT
+  //kvmmapkern(kpagetable, CLINT, CLINT, 0x10000, PTE_R | PTE_W);
+
+  // PLIC
+  ukvmmap(kpagetable, PLIC, PLIC, 0x400000, PTE_R | PTE_W);
+
   return kpagetable;
 }
 
@@ -223,6 +236,18 @@ proc_pagetable(struct proc *p)
 void
 proc_freekpagetable(pagetable_t kpagetable)
 {
+  //don't use uvmunmap
+  pte_t pte = kpagetable[0];
+  pagetable_t level1 = (pagetable_t) PTE2PA(pte);
+  for (int i = 0; i < 512; i++) {
+   	pte_t pte = level1[i];
+    if (pte & PTE_V) {
+      uint64 level2 = PTE2PA(pte);
+      kfree((void *) level2);
+      level1[i] = 0;
+    }
+  }
+  kfree((void *) level1);
   kfree((void*)kpagetable);
 }
 
@@ -273,6 +298,10 @@ userinit(void)
 
   p->state = RUNNABLE;
 
+  // ==========section 3==================
+  pgtbl_to_kpgtbl(p->kpagetable,p->pagetable,0,p->sz);
+  // ==========section 3==================
+
   release(&p->lock);
 }
 
@@ -292,6 +321,11 @@ growproc(int n)
   } else if(n < 0){
     sz = uvmdealloc(p->pagetable, sz, sz + n);
   }
+
+  // ===========section 3===========
+  pgtbl_to_kpgtbl(p->kpagetable,p->pagetable,p->sz,sz);
+  // ===========section 3===========
+
   p->sz = sz;
   return 0;
 }
@@ -335,6 +369,10 @@ fork(void)
   safestrcpy(np->name, p->name, sizeof(p->name));
 
   pid = np->pid;
+
+  // ===========section 3===========
+  pgtbl_to_kpgtbl(np->kpagetable,np->pagetable,0,np->sz);
+  // ===========section 3===========
 
   np->state = RUNNABLE;
 
