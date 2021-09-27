@@ -15,6 +15,8 @@ struct proc *initproc;
 int nextpid = 1;
 struct spinlock pid_lock;
 
+extern pagetable_t kernel_pagetable;
+
 extern void forkret(void);
 static void wakeup1(struct proc *chan);
 static void freeproc(struct proc *p);
@@ -112,6 +114,10 @@ found:
     release(&p->lock);
     return 0;
   }
+  // ==========section 2==================
+  //kernel page table
+  p->kpagetable = proc_kpagetable();
+  // ==========section 2==================
 
   // An empty user page table.
   p->pagetable = proc_pagetable(p);
@@ -142,6 +148,13 @@ freeproc(struct proc *p)
   if(p->pagetable)
     proc_freepagetable(p->pagetable, p->sz);
   p->pagetable = 0;
+  
+  // ==========section 2==================
+  if(p->kpagetable)
+  	proc_freekpagetable(p->kpagetable);
+  p->kpagetable = 0;
+  // ==========section 2==================
+
   p->sz = 0;
   p->pid = 0;
   p->parent = 0;
@@ -151,6 +164,25 @@ freeproc(struct proc *p)
   p->xstate = 0;
   p->state = UNUSED;
 }
+
+// ==========section 2==================
+
+//Create a kernel pagetable for a given process
+pagetable_t
+proc_kpagetable(void)
+{
+  pagetable_t kpagetable;
+  kpagetable = uvmcreate();
+  if(kpagetable == 0)
+    return 0;
+  //just copy kernel_pagetable
+  for(int i=0;i<512;i++){
+    kpagetable[i]=kernel_pagetable[i];
+  }
+  return kpagetable;
+}
+
+// ==========section 2==================
 
 // Create a user page table for a given process,
 // with no user memory, but with trampoline pages.
@@ -184,6 +216,17 @@ proc_pagetable(struct proc *p)
 
   return pagetable;
 }
+
+// ==========section 2==================
+
+// Free a process's kernel page table
+void
+proc_freekpagetable(pagetable_t kpagetable)
+{
+  kfree((void*)kpagetable);
+}
+
+// ==========section 2==================
 
 // Free a process's page table, and free the
 // physical memory it refers to.
@@ -473,11 +516,20 @@ scheduler(void)
         // before jumping back to us.
         p->state = RUNNING;
         c->proc = p;
+
+		// ==========section 2==================
+        w_satp(MAKE_SATP(p->kpagetable));
+        sfence_vma();
+		// ==========section 2==================
         swtch(&c->context, &p->context);
 
         // Process is done running for now.
         // It should have changed its p->state before coming back.
         c->proc = 0;
+
+		// ==========section 2==================
+		kvminithart();
+		// ==========section 2==================
 
         found = 1;
       }
