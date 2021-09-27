@@ -16,7 +16,7 @@
 #### lab
 1. [lab1: Xv6 and Unix utilities](https://github.com/fung-hwang/6.S081-2020fall/blob/main/lab/lab1-utilities.md)
 2. [lab2: System calls](https://github.com/fung-hwang/6.S081-2020fall/blob/main/lab/lab2-system-calls.md)
-3. lab3: Page tables
+3. [lab3: Page tables](https://github.com/fung-hwang/6.S081-2020fall/blob/main/lab/lab3-page-tables.md)
 
 #### 最后
 + 不知道什么时候能把lab做完，反正尽全力
