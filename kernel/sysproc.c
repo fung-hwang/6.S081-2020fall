@@ -61,6 +61,11 @@ sys_sleep(void)
   if(argint(0, &n) < 0)
     return -1;
   acquire(&tickslock);
+  
+  // ========= lab4 section2=======
+  backtrace();
+  // ========= lab4 section2=======
+
   ticks0 = ticks;
   while(ticks - ticks0 < n){
     if(myproc()->killed){

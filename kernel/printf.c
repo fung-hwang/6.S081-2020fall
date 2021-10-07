@@ -132,3 +132,22 @@ printfinit(void)
   initlock(&pr.lock, "pr");
   pr.locking = 1;
 }
+
+// ========= lab4 section2=======
+void
+backtrace(void)
+{
+  uint64 fp;
+  uint64 pgup;
+  uint64* temp;
+  fp=r_fp();
+  pgup=PGROUNDUP(fp);
+  while(fp<pgup){
+    temp=(uint64*)(fp-8);
+    printptr(*temp);	//return address
+	printf("\n");
+	temp=(uint64*)(fp-16);
+	fp=*temp;	//s0
+  }
+}
+// ========= lab4 section2=======
