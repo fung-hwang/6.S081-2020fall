@@ -7,6 +7,33 @@
 #include "spinlock.h"
 #include "proc.h"
 
+// ======lab4 section3========
+uint64
+sys_sigalarm(void)
+{
+  int n;
+  uint64 addr;
+  if(argint(0, &n) < 0 || argaddr(1, &addr) < 0)
+   	return -1;
+  struct proc* p = myproc();
+  //Prevent re-entrant calls to the handler
+  //if(p->is_alarming == 1)
+  //  return -1;
+  p->ticks = n;
+  p->handler = (void (*)())addr;
+  return 0;
+}
+
+uint64
+sys_sigreturn(void)
+{
+  struct proc* p = myproc();   
+  p->is_alarming = 0;
+  memmove(p->trapframe, p->alarm_trapframe, sizeof(struct trapframe));
+  return 0;
+}
+// ======lab4 section3========
+
 uint64
 sys_exit(void)
 {
