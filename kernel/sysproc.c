@@ -17,8 +17,8 @@ sys_sigalarm(void)
    	return -1;
   struct proc* p = myproc();
   //Prevent re-entrant calls to the handler
-  //if(p->is_alarming == 1)
-  //  return -1;
+  if(p->is_alarming == 1)
+    return -1;
   p->ticks = n;
   p->handler = (void (*)())addr;
   return 0;
