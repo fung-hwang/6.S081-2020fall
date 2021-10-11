@@ -50,7 +50,26 @@ usertrap(void)
   // save user program counter.
   p->trapframe->epc = r_sepc();
   
-  if(r_scause() == 8){
+  // ====lab5 section2======
+  if(r_scause() == 13 || r_scause() == 15 ){
+	char *mem;
+	uint64 va = r_stval();	// page fault va
+	va = PGROUNDDOWN(va);
+	mem = kalloc();	//pa
+    if(mem == 0){
+	  //uvmunmap(p->pagetable, va, 1, 0);
+	  panic("kalloc fault");
+	}
+	memset(mem, 0, PGSIZE);
+	// map
+	if(mappages(p->pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
+	  kfree(mem);
+	  //uvmunmap(p->pagetable, va, 1, 0);
+	  panic("map fault");
+	}
+  }
+  // ====lab5 section2======
+  else if(r_scause() == 8){
     // system call
 
     if(p->killed)
