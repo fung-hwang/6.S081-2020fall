@@ -50,25 +50,37 @@ usertrap(void)
   // save user program counter.
   p->trapframe->epc = r_sepc();
   
-  // ====lab5 section2======
+  // ============ lab5 ===============
   if(r_scause() == 13 || r_scause() == 15 ){
 	char *mem;
 	uint64 va = r_stval();	// page fault va
+	// if va > sz, kill the proc
+	if(va >= p->sz){
+	  p->killed = 1;	//kill
+	  goto kill;
+	}
+
+	//guard page
+	if(va < PGROUNDDOWN(p->trapframe->sp)){
+	  p->killed = 1;	//kill
+	  goto kill;
+	}
+
 	va = PGROUNDDOWN(va);
-	mem = kalloc();	//pa
-    if(mem == 0){
-	  //uvmunmap(p->pagetable, va, 1, 0);
-	  panic("kalloc fault");
+	mem = kalloc();		//pa
+	if(mem == 0){
+	  p->killed = 1;	//kill
+	  goto kill;
 	}
 	memset(mem, 0, PGSIZE);
 	// map
 	if(mappages(p->pagetable, va, PGSIZE, (uint64)mem, PTE_W|PTE_X|PTE_R|PTE_U) != 0){
 	  kfree(mem);
-	  //uvmunmap(p->pagetable, va, 1, 0);
-	  panic("map fault");
+	  p->killed = 1;	//kill
+	  goto kill;
 	}
   }
-  // ====lab5 section2======
+  // ================ lab5 ===============
   else if(r_scause() == 8){
     // system call
 
@@ -92,6 +104,7 @@ usertrap(void)
     p->killed = 1;
   }
 
+kill:
   if(p->killed)
     exit(-1);
 

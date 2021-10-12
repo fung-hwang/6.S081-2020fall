@@ -15,6 +15,31 @@ extern char etext[];  // kernel.ld sets this to end of kernel code.
 
 extern char trampoline[]; // trampoline.S
 
+void
+vmprint_PTE(pagetable_t pagetable,int level)
+{
+  for (int i = 0; i < 512; i++){
+    pte_t pte = pagetable[i];
+	if (pte & PTE_V) {
+	  for (int j = 0; j < -level + 3; j++) {
+	  	printf("..");
+		if (j != -level + 2) printf(" ");
+	  }
+	  printf("%d: pte %p pa %p\n", i, pte, PTE2PA(pte));								
+	  if (level > 0)
+	    vmprint_PTE((pagetable_t)(PTE2PA(pte)), level - 1);
+	}
+  }
+}
+
+void
+vmprint(pagetable_t pagetable)
+{
+	printf("page table %p\n",pagetable);
+
+	vmprint_PTE(pagetable,2);
+}
+
 /*
  * create a direct-map page table for the kernel.
  */
@@ -180,21 +205,20 @@ uvmunmap(pagetable_t pagetable, uint64 va, uint64 npages, int do_free)
     panic("uvmunmap: not aligned");
 
   for(a = va; a < va + npages*PGSIZE; a += PGSIZE){
-	if((pte = walk(pagetable, a, 0)) == 0)
-      panic("uvmunmap: walk");
-    //if((*pte & PTE_V) == 0)
-    //  panic("uvmunmap: not mapped");
+	// ====== lab5 ========
+	if((pte = walk(pagetable, a, 0)) == 0){
+	  continue;
+	}
+    if((*pte & PTE_V) == 0)
+      continue;
+	// ====== lab5 ========
     if(PTE_FLAGS(*pte) == PTE_V)
       panic("uvmunmap: not a leaf");
-	// ====== lab5 section2 ========
-    if((*pte) & PTE_V){
-      if(do_free){
-        uint64 pa = PTE2PA(*pte);
-        kfree((void*)pa);
-      }
-      *pte = 0;
-    }
-	// ====== lab5 section2 ========
+    if(do_free){
+      uint64 pa = PTE2PA(*pte);
+      kfree((void*)pa);
+	}
+    *pte = 0;
   }
 }
 
@@ -318,11 +342,13 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   char *mem;
 
   for(i = 0; i < sz; i += PGSIZE){
+    // ====== lab5 ======
     if((pte = walk(old, i, 0)) == 0)
-      panic("uvmcopy: pte should exist");
+      continue;
     if((*pte & PTE_V) == 0)
-      panic("uvmcopy: page not present");
-    pa = PTE2PA(*pte);
+      continue;
+    // ====== lab5 ======
+	pa = PTE2PA(*pte);
     flags = PTE_FLAGS(*pte);
     if((mem = kalloc()) == 0)
       goto err;

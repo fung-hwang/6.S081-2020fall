@@ -2077,6 +2077,7 @@ sbrkmuch(char *s)
   amt = BIG - (uint64)a;
   p = sbrk(amt);
   if (p != a) {
+    printf("p = %p   a = %p\n", p, a);
     printf("%s: sbrk test failed to grow big address space; enough phys mem?\n", s);
     exit(1);
   }
