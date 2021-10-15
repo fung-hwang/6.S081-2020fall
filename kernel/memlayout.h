@@ -65,3 +65,5 @@
 //   TRAPFRAME (p->trapframe, used by the trampoline)
 //   TRAMPOLINE (the same page as in the kernel)
 #define TRAPFRAME (TRAMPOLINE - PGSIZE)
+
+#define REFER_INDEX(pa) (((uint64)pa-KERNBASE)/PGSIZE)
