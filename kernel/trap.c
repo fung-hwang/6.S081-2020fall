@@ -35,7 +35,7 @@ trapinithart(void)
 // handle an interrupt, exception, or system call from user space.
 // called from trampoline.S
 //
-void
+	void
 usertrap(void)
 {
 	int which_dev = 0;
@@ -52,7 +52,8 @@ usertrap(void)
 	// save user program counter.
 	p->trapframe->epc = r_sepc();
 
-	if(r_scause() == 13 || r_scause() == 15){ 
+	if( r_scause() == 15){ 
+		//printf("trap-----------------\n");
 		uint64 old_pa;
 		uint64 new_pa;
 		pte_t *pte;
@@ -65,6 +66,7 @@ usertrap(void)
 		new_pa = (uint64)kalloc();	//new pa
 		if(new_pa == 0){
 			p->killed = 1;
+			goto kill;
 		}
 		// copy mem page content
 		memmove((void*)new_pa, (void*)old_pa ,PGSIZE);
@@ -74,7 +76,8 @@ usertrap(void)
 		mappages(p->pagetable, va, PGSIZE, new_pa ,PTE_W|PTE_R|PTE_X|PTE_U);
 		// reference num
 		kfree((void*)old_pa);
-	}
+	//	printf("trap over-----------------\n");
+    }
 	else if(r_scause() == 8){
 		// system call
 
@@ -98,6 +101,7 @@ usertrap(void)
 		p->killed = 1;
 	}
 
+kill:
 	if(p->killed)
 		exit(-1);
 

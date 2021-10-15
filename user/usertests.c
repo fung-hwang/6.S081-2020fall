@@ -2683,7 +2683,7 @@ main(int argc, char *argv[])
     char *s;
   } tests[] = {
     {execout, "execout"},
-    {copyin, "copyin"},
+		{copyin, "copyin"},
     {copyout, "copyout"},
     {copyinstr1, "copyinstr1"},
     {copyinstr2, "copyinstr2"},
@@ -2739,7 +2739,7 @@ main(int argc, char *argv[])
     {dirfile, "dirfile"},
     {iref, "iref"},
     {forktest, "forktest"},
-    {bigdir, "bigdir"}, // slow
+		{bigdir, "bigdir"}, // slow
     { 0, 0},
   };
 

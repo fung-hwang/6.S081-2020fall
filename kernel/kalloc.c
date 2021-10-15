@@ -16,6 +16,8 @@ extern int refer[];
 extern char end[]; // first address after kernel.
                    // defined by kernel.ld.
 
+struct spinlock ref_cnt_lock;
+
 struct run {
   struct run *next;
 };
@@ -53,9 +55,9 @@ kfree(void *pa)
   if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
     panic("kfree");
 
-  acquire(&kmem.lock);
+  acquire(&ref_cnt_lock);
   refer[REFER_INDEX(pa)]--;
-	release(&kmem.lock);
+  release(&ref_cnt_lock);
 
 	//printf("refer[index] = %d\n",refer[REFER_INDEX(pa)]);
 	if(refer[REFER_INDEX(pa)] <= 0){
@@ -87,14 +89,9 @@ kalloc(void)
 
   if(r){
     memset((char*)r, 5, PGSIZE); // fill with junk
-	  refer[REFER_INDEX((uint64)r)] = 1;
-  }
-
-	int index = REFER_INDEX((uint64)r);
-	if(r && (index<0 || index>=(PHYSTOP-KERNBASE)/4096)){
-	  printf("pa = %p\n",(uint64)r);
-		printf("refer index = %p\n", index);
-		printf("-------");
+	  acquire(&ref_cnt_lock);
+		refer[REFER_INDEX((uint64)r)] = 1;
+    release(&ref_cnt_lock);
 	}
 
 	return (void*)r;
