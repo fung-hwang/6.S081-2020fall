@@ -21,6 +21,7 @@
 4. [lab4: Traps](https://github.com/fung-hwang/6.S081-2020fall/blob/main/lab/lab4-traps.md)
 5. [lab5: Lazy allocation](https://github.com/fung-hwang/6.S081-2020fall/blob/main/lab/lab5-lazy-page-allocation.md)
 6. [lab6: Cow Fork](https://github.com/fung-hwang/6.S081-2020fall/blob/main/lab/lab6-cow-fork.md)
+7. [lab7: Multithreading](https://github.com/fung-hwang/6.S081-2020fall/blob/main/lab/Lab7-Multithreading.md)
 
 #### 最后
 + 不知道什么时候能把lab做完，反正尽全力
