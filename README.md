@@ -1,15 +1,18 @@
 # 6.S081-2020fall
-### 简介
-+ 该课程为 **MIT6.S081-2020fall**
+### 课程简介
+1. 本课程为 **MIT6.S081-2020fall**
+2. 课程在OS理论的宽度和深度上没有延展太多，精髓是xv6的实现以及实验内容。在实际的编码过程中，我们将会直观、细致、深入地理解操作系统内核实现，这是单纯的理论学习是难以触及的。
+3. xv6 book和对应的实验将逐步引领我们阅读、理解xv6源码，并在xv6上做进一步开发和优化。
+4. 学习曲线并不陡峭，尤其在迈过 *lab3: Pagetables* 后堪称一马平川。
 
 ### 参考资料
 1. [课程官网: MIT6.S081-2020fall](https://pdos.csail.mit.edu/6.S081/2020/schedule.html)
-2. [课程内容中文翻译](https://mit-public-courses-cn-translatio.gitbook.io/mit6-s081/) （来自[肖宏辉](https://www.zhihu.com/people/xiao-hong-hui-15)）
-3. [All-in-one课程仓库（xv6中文文档、lab及lab解析）](http://xv6.dgs.zone/)
-3. [xv6中文文档（2）](https://github.com/pleasewhy/xv6-book-2020-Chinese)（部分内容需要修改和完善）
+2. [课程内容中文翻译](https://mit-public-courses-cn-translatio.gitbook.io/mit6-s081/) （贡献者：[肖宏辉](https://www.zhihu.com/people/xiao-hong-hui-15)）
+3. [All-in-one课程仓库（xv6中文文档、lab翻译及解析）](http://xv6.dgs.zone/)
+4. [xv6中文文档（2）](https://github.com/pleasewhy/xv6-book-2020-Chinese)（部分内容需要修改和完善）
 5. [名校公开课程评价网-6.S081](https://conanhujinming.github.io/comments-for-awesome-courses/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/MIT6.S081%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E5%AF%BC%E8%AE%BA/)
 6. [lab环境搭建指南](https://www.bilibili.com/video/BV11K4y127Qk?)
-7. [自己学习过程中的一些记录(Notion)](https://evernight.notion.site/MIT-6-S081-708ca9dbc6fb450684ac28cba6616d12)
+7. [学习过程中的一些记录](https://evernight.notion.site/MIT-6-S081-708ca9dbc6fb450684ac28cba6616d12)
 8. xv6文档阅读笔记（待填坑）
 
 ### 实验
@@ -23,11 +26,14 @@
 8. [lab8: Locks](https://github.com/fung-hwang/6.S081-2020fall/blob/main/lab/lab8-locks.md)
 
 ### 说明
-1. 
+1. 我认为该课程的前置知识包括：C（熟练）、汇编（入门）、操作系统基础理论。三者中至少应具备两者，否则，即使边学边补，需要补的内容太多也会影响主线xv6的学习。
+2. 如果对OS理论较为了解，并且能完全读懂xv6 book，那么课程视频不看也无妨。在不能完全理解时，课程视频往往有所帮助，毕竟课堂讲解会更通俗易懂。
+3. 实验务必独立完成。
+4. 在完成实验过程中可能会学习一些新工具，比如gdb、vim、git等等。刚开始也许会有点不适应，但这些玩意都非常好用，很值得花时间学习。
 
 ### 最后
 + 不知道什么时候能把lab做完，反正尽全力（最后两个lab可能会摆烂）
-+ 计划借此补上欠缺的OS基础理论和实践(显然这门优秀的课程足以使我达成该目标)
++ 计划借此补上欠缺的OS基础理论和实践（显然这门优秀的课程足以使我达成该目标）
 + 感谢所有的6.S081资源贡献者
-+ 感谢若干年前邹姝稚老师带领我完成了操作系统基础理论的学习，我受益至今
++ 感谢邹姝稚老师带领我完成操作系统基础理论的学习，我受益至今
 + 讨论交流/指正错误，欢迎issue或与我联系zhoushaofeng@mail.ustc.edu.cn
