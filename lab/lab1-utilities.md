@@ -86,7 +86,13 @@ main(int argc, char *argv[])
 ```
 
 ### primes
-+ 解析在Noiton中
++ sink函数进行以下几步操作：
++ 从左边pipe读入prime（此时main_proc标准输入为左边pipe读取端）
++ 创建新pipe
++ 创建子进程，子进程的标准输出重定向为新pipe写入端
++ 子进程调用sieve函数，读取，筛选，写入
++ 将main_proc标准输入重定向为新pipe读取端，以便下个sink读入数据
++ ![primes](https://github.com/fung-hwang/MIT6.S081-2020fall/blob/main/images/primes.jpeg)
 
 ``` C
 #include "kernel/types.h"
