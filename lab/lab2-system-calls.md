@@ -1,23 +1,22 @@
-## Lab2: system calls
+# Lab2: system calls
 
-#### trace
+### trace
 + 根据lab提示完成声明、数据等的补充
 + struct proc中增加掩码mask
 + 执行系统调用trace时从a0处获得mask
 + 每次系统调用结束前打印，打印前需判断该系统调用是否被掩码mask掩蔽
 + 子进程需继承父进程的mask
 
-kernel/proc.h
+`kernel/proc.h`
 ```c
 struct proc {
   //已有内容省略
   //add mask
   int mask;
 };
-
 ```
 
-kernel/sysproc.c
+`kernel/sysproc.c`
 ```c
 uint64
 sys_trace(void)
@@ -32,7 +31,7 @@ sys_trace(void)
 
 ```
 
-kernel/syscall.c
+`kernel/syscall.c`
 ```c
 void
 syscall(void)
@@ -82,7 +81,7 @@ syscall(void)
 
 ```
 
-kernel/proc.c
+`kernel/proc.c`
 ```c
 int
 fork(void)
@@ -94,13 +93,13 @@ fork(void)
 }
 ```
 
-#### sysinfo
+### sysinfo
 + 和trace一样完成声明、数据等的补充
 + 在kalloc.c中遍历空闲块链freelist，统计空闲块数量
 + 在proc.c中统计进程数量
 + 在sys_sysinfo()中使用copyout()，将内核变量传递到用户空间
 
-kernel/sysproc.c
+`kernel/sysproc.c`
 ```c
 uint64
 sys_sysinfo()
@@ -128,7 +127,7 @@ sys_sysinfo()
 
 ```
 
-kernel/kalloc.c
+`kernel/kalloc.c`
 ```c
 uint64
 freemem()
@@ -141,7 +140,7 @@ freemem()
 }
 ```
 
-kernel/proc.c
+`kernel/proc.c`
 ```c
 uint64
 proc_num(void)

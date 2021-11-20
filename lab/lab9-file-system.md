@@ -2,7 +2,7 @@
 
 ### Large files
 + 仿照一级间接块地址 singly-indirect 摹写二级间接块地址 doubly-indirect
-+ `fs.h`中保留NINDIRECT是因为mkfs的需要
++ `fs.h`中保留NINDIRECT是出于mkfs的需要
 
 `kernel/fs.h`
 ```c

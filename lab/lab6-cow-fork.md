@@ -1,4 +1,4 @@
-## Copy-on-Write Fork
+# Lab6: Copy-on-Write Fork
 
 + 注意细节，注意细节，注意细节
 
@@ -47,7 +47,7 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 	uint64 n, va0, pa0;
 	pte_t *pte;
 
-	while(len > 0){
+	while (len > 0) {
 		va0 = PGROUNDDOWN(dstva);
 		pa0 = walkaddr(pagetable, va0);
 		if (pa0 == 0) {
@@ -57,22 +57,23 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 		if (*pte & PTE_COW)
 		{
 			// allocate a new page
-			uint64 ka = (uint64) kalloc(); // newly allocated physical address
+			uint64 ka = (uint64)kalloc(); // newly allocated physical address
 
-			if (ka == 0){
+			if (ka == 0) {
 				struct proc *p = myproc();
 				p->killed = 1; // there's no free memory
-			} else {
+			}
+			else {
 				memmove((char*)ka, (char*)pa0, PGSIZE); // copy the old page to the new page
-					 uint flags = PTE_FLAGS(*pte);
-					 uvmunmap(pagetable, va0, 1, 1);
-				 *pte = PA2PTE(ka) | flags | PTE_W;
-				 *pte &= ~PTE_COW;
-				 pa0 = ka;
+				uint flags = PTE_FLAGS(*pte);
+				uvmunmap(pagetable, va0, 1, 1);
+				*pte = PA2PTE(ka) | flags | PTE_W;
+				*pte &= ~PTE_COW;
+				pa0 = ka;
 			}
 		}
 		n = PGSIZE - (dstva - va0);
-		if(n > len)
+		if (n > len)
 			n = len;
 		memmove((void *)(pa0 + (dstva - va0)), src, n);
 
@@ -86,28 +87,28 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
 
 `kernel/trap.c`
 ```c
-if( r_scause() == 15){ 
-		uint64 old_pa;
-		uint64 new_pa;
-		pte_t *pte;
-		uint64 va = r_stval();	// page fault va
-		va = PGROUNDDOWN(va);
-		old_pa = walkaddr(p->pagetable, va);  // cow page
-		if(old_pa == 0){
-			panic("lack cow page");
-		}
-		new_pa = (uint64)kalloc();	//new pa
-		if(new_pa == 0){
-			p->killed = 1;
-			goto kill;
-		}
-		// copy mem page content
-		memmove((void*)new_pa, (void*)old_pa ,PGSIZE);
-		// before map, let PTE_V=0
-		pte = walk(p->pagetable, va, 0);
-		*pte = *pte & ~PTE_V;
-		mappages(p->pagetable, va, PGSIZE, new_pa ,PTE_W|PTE_R|PTE_X|PTE_U);
-		// reference num
-		kfree((void*)old_pa);
-    }
+if(r_scause() == 15) {
+	uint64 old_pa;
+	uint64 new_pa;
+	pte_t *pte;
+	uint64 va = r_stval();	// page fault va
+	va = PGROUNDDOWN(va);
+	old_pa = walkaddr(p->pagetable, va);  // cow page
+	if (old_pa == 0) {
+		panic("lack cow page");
+	}
+	new_pa = (uint64)kalloc();	//new pa
+	if (new_pa == 0) {
+		p->killed = 1;
+		goto kill;
+	}
+	// copy mem page content
+	memmove((void*)new_pa, (void*)old_pa, PGSIZE);
+	// before map, let PTE_V=0
+	pte = walk(p->pagetable, va, 0);
+	*pte = *pte & ~PTE_V;
+	mappages(p->pagetable, va, PGSIZE, new_pa, PTE_W | PTE_R | PTE_X | PTE_U);
+	// reference num
+	kfree((void*)old_pa);
+}
 ```

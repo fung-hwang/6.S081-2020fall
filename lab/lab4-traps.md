@@ -1,9 +1,9 @@
-## Lab4: Traps
+# Lab4: Traps
 
-#### RISC-V assembly
+### RISC-V assembly
 略
 
-#### Backtrace 
+### Backtrace 
 + 顺着fp链自顶至底打印每帧中的返回地址即可
 
 `kernel/printf.c`
@@ -26,7 +26,7 @@ backtrace(void)
 }
 ```
 
-#### Alarm
+### Alarm
 + 将一次系统调用的动作放到两次系统调用中完成
 + 指定sigalarm返回地址，将原本返回的内容放在sigreturn中完成。需要在sigalarm中保存相关寄存器（sp, ra, s0, a1, epc等），可以完整保存trapframe以简化思考。
 
@@ -34,19 +34,16 @@ backtrace(void)
 ```c
 struct proc {
   
-  // ======lab4 section3========
   int ticks;                   // alarm interval
   void (*handler)();           // the pointer to the handler function
   int ticks_pass;              // ticks have passed
   int is_alarming;             // is realarm
   struct trapframe* alarm_trapframe;
-  // ======lab4 section3========
 };
 ```
 
 `kernel/sysproc.c`
 ```c
-// ======lab4 section3========
 uint64
 sys_sigalarm(void)
 {
@@ -76,12 +73,9 @@ sys_sigreturn(void)
 
 `kernel/trap.c/usertrap()`
 ```c
-// ======lab4 section3========
-
   // give up the CPU if this is a timer interrupt.
   //if(which_dev == 2)
   //  yield();
-
   if(which_dev == 2 && p->ticks){
       p->ticks_pass++;
 	  if(p->ticks_pass == p->ticks && p->is_alarming == 0){
@@ -92,12 +86,10 @@ sys_sigreturn(void)
 	  }
       yield();
   }
-  // ======lab4 section3========
 ```
 
 `kernel/proc.c/allocproc()`
 ```c
-// ========lab4 section4=======
   if((p->alarm_trapframe = (struct trapframe*)kalloc()) == 0) {
       freeproc(p);
 	  release(&p->lock);
@@ -107,12 +99,10 @@ sys_sigreturn(void)
   p->ticks_pass = 0;
   p->is_alarming = 0;
   p->handler =(void (*)())0xffffffffff;
-  // ========lab4 section4=======
 ```
 
 `kernel/proc.c/freeproc()`
 ```c
-// ========lab4 section4=======
   p->ticks = 0;
   p->ticks_pass = 0;
   p->is_alarming = 0;
@@ -120,5 +110,4 @@ sys_sigreturn(void)
   if(p->alarm_trapframe)
       kfree((void*)p->alarm_trapframe);
   p->alarm_trapframe = 0;
-  // ========lab4 section4=======
 ```

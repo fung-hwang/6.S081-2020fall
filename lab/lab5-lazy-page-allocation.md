@@ -1,6 +1,6 @@
-## Lazy page allocation 
+# Lab5: Lazy page allocation 
 
-#### Eliminate allocation from sbrk()
+### Eliminate allocation from sbrk()
 `kernel/sysproc.c`
 ```c
 uint64
@@ -21,7 +21,7 @@ sys_sbrk(void)
 }
 ```
 
-#### Lazy allocation
+### Lazy allocation
 + 发生页面错误时分配物理页面（kalloc和mappages）
 
 `kernel/trap.c/usertrap()`
@@ -74,7 +74,7 @@ for (a = va; a < va + npages * PGSIZE; a += PGSIZE) {
 }
 ```
 
-#### Lazytests and Usertests
+### Lazytests and Usertests
 + 注意细节，注意细节，注意细节
 + 因为惰性分配，需根据最后一级页表的PTE_V核查是否实际分配物理页面
 
@@ -123,6 +123,7 @@ for(i = 0; i < sz; i += PGSIZE){
   }
 }
 ```
+
 `kernel/vm.c/uvmunmap()`
 ```c
 for(a = va; a < va + npages*PGSIZE; a += PGSIZE){

@@ -1,9 +1,9 @@
-## Lab1: Xv6 and Unix utilities
+# Lab1: Xv6 and Unix utilities
 
-#### Boot xv6
+### Boot xv6
 + 跑通就算胜利，不废话
 
-#### sleep
+### sleep
 + 调用sleep系统调用即可
 
 ``` C
@@ -28,64 +28,64 @@ main(int argc, char *argv[])
 }
 ```
 
-#### pingpong
+### pingpong
 + pipe的简单应用
 + 一个要点是父进程中的wait(0)
 
 ``` C
- #include "kernel/types.h"
- #include "kernel/stat.h"
- #include "user/user.h"
+#include "kernel/types.h"
+#include "kernel/stat.h"
+#include "user/user.h"
 
- int
- main(int argc, char *argv[])
- {
-      int p[2];
-      char buf[2];
-      pipe(p);
-      //child
-      if(fork()==0)
-      {
-          if(read(p[0],buf,1)<=0)
-          {
-              fprintf(2,"child read error...\n");
-              exit(1);
-          }
-          //printf("%c",buf[0]);
-          close(p[0]);
-          printf("%d: received ping\n",getpid());
-          if(write(p[1],buf,1)<=0)
-          {
-               fprintf(2,"child write error...\n");
-               exit(1);
-          }
-          close(p[1]);
-      }
-      //parent
-      else
-        {
-            buf[0]='x';
-            if(write(p[1],buf,1)<=0)
-            {
-                fprintf(2,"parent write error...\n");
-                exit(1);
-            }
-            close(p[1]);
-            wait(0);    //without wait, parent proc can finish write-read by itself
-            if(read(p[0],buf,1)<=0)
-            {
-                fprintf(2,"parent read error...\n");
-                exit(1);
-            }
-            printf("%d: received pong\n",getpid());
-            close(p[0]);
-        }
+int
+main(int argc, char *argv[])
+{
+	int p[2];
+	char buf[2];
+	pipe(p);
+	//child
+	if (fork() == 0)
+	{
+		if (read(p[0], buf, 1) <= 0)
+		{
+			fprintf(2, "child read error...\n");
+			exit(1);
+		}
+		//printf("%c",buf[0]);
+		close(p[0]);
+		printf("%d: received ping\n", getpid());
+		if (write(p[1], buf, 1) <= 0)
+		{
+			fprintf(2, "child write error...\n");
+			exit(1);
+		}
+		close(p[1]);
+	}
+	//parent
+	else
+	{
+		buf[0] = 'x';
+		if (write(p[1], buf, 1) <= 0)
+		{
+			fprintf(2, "parent write error...\n");
+			exit(1);
+		}
+		close(p[1]);
+		wait(0);    //without wait, parent proc can finish write-read by itself
+		if (read(p[0], buf, 1) <= 0)
+		{
+			fprintf(2, "parent read error...\n");
+			exit(1);
+		}
+		printf("%d: received pong\n", getpid());
+		close(p[0]);
+	}
 
-        exit(0);
-    }
+	exit(0);
+}
 ```
 
-#### primes
+### primes
 + 解析在Noiton中
 
 ``` C
@@ -149,7 +149,7 @@ main(int argc, char *argv[]) {
 }
 ```
 
-#### find
+### find
 + 对ls.c的拙劣模仿
 + 递归查看目录，递归边界是文件
 + 不得进入目录"."和".."
@@ -239,9 +239,9 @@ main(int argc, char *argv[])
 
 ```
 
-#### xargs
+### xargs
 + 逻辑非常简单：从stdin中收集每次exec的参数，在每个子进程中exec即可
-+ C的字符串写的太差了，纯纯的摆烂了，有时间重写 **（务必回顾C字符串）**
++ C的字符串写的太差了，纯纯的摆烂了，有时间重写 
 
 ``` C
 #include "kernel/types.h"
