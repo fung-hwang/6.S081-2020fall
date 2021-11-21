@@ -41,29 +41,29 @@ bmap(struct inode *ip, uint bn)
     brelse(bp);
     return addr;
   }
-    bn -= NSINDIRECT;    
+  bn -= NSINDIRECT;    
 
-    if(bn < NDINDIRECT){
+  if(bn < NDINDIRECT){
     // Load doubly-indirect block, allocating if necessary.
-        if((addr = ip->addrs[NDIRECT+1]) == 0)
-      ip->addrs[NDIRECT+1] = addr = balloc(ip->dev);
-        bp = bread(ip->dev, addr);
-        a = (uint*)bp->data;
-        if((addr = a[bn/NSINDIRECT]) == 0){
-            a[bn/NSINDIRECT] = addr = balloc(ip->dev);
-            log_write(bp);
-        }
-        brelse(bp);
-        
-        bp = bread(ip->dev, addr);
-        a = (uint*)bp->data;
-        if((addr = a[bn%NSINDIRECT]) == 0){
-            a[bn%NSINDIRECT] = addr = balloc(ip->dev);
-            log_write(bp);
-        }
-        brelse(bp);
-        return addr;
+    if((addr = ip->addrs[NDIRECT+1]) == 0)
+        ip->addrs[NDIRECT+1] = addr = balloc(ip->dev);
+    bp = bread(ip->dev, addr);
+    a = (uint*)bp->data;
+    if((addr = a[bn/NSINDIRECT]) == 0){
+      a[bn/NSINDIRECT] = addr = balloc(ip->dev);
+      log_write(bp);
     }
+    brelse(bp);
+        
+    bp = bread(ip->dev, addr);
+    a = (uint*)bp->data;
+    if((addr = a[bn%NSINDIRECT]) == 0){
+      a[bn%NSINDIRECT] = addr = balloc(ip->dev);
+      log_write(bp);
+    }
+    brelse(bp);
+    return addr;
+  }
 
   panic("bmap: out of range");
 }
@@ -102,17 +102,17 @@ itrunc(struct inode *ip)
   if(ip->addrs[NDIRECT+1]){
     bp = bread(ip->dev, ip->addrs[NDIRECT+1]);
     a = (uint*)bp->data;
-      for(int j = 0; j < NSINDIRECT; j++){
-        if(a[j]){
-          bp2 = bread(ip->dev, a[j]);
-          a2 = (uint*)bp2->data;
-          for(int k = 0; k < NSINDIRECT; k++){
-            if(a2[k])
-              bfree(ip->dev, a2[k]);
-          }
-          brelse(bp2);
-          bfree(ip->dev, a[j]);
-          a[j] = 0;
+    for(int j = 0; j < NSINDIRECT; j++){
+      if(a[j]){
+        bp2 = bread(ip->dev, a[j]);
+        a2 = (uint*)bp2->data;
+        for(int k = 0; k < NSINDIRECT; k++){
+          if(a2[k])
+            bfree(ip->dev, a2[k]);
+        }
+        brelse(bp2);
+        bfree(ip->dev, a[j]);
+        a[j] = 0;
       }//if
     }//for
     brelse(bp);
@@ -139,8 +139,8 @@ if((ip = dirlookup(dp, name, 0)) != 0){
   if(type == T_FILE && (ip->type == T_FILE || ip->type == T_DEVICE))
     return ip;
       // ======== lab9 =========
-      if(type == T_SYMLINK && ip->type == T_SYMLINK)
-        return ip;
+  if(type == T_SYMLINK && ip->type == T_SYMLINK)
+    return ip;
       // ======== lab9 =========
   iunlockput(ip);
   return 0;
